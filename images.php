@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images37.php
+ * images39.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -25,6 +25,9 @@
  * Visit https://opensource.org/licenses/MIT
 */
  
+// set $CheckPW to FALSE to disable password checking
+// set $recursive to FALSE to disable traversing sub folders
+
 // start session before we do anything else
 session_start();
 
@@ -683,8 +686,8 @@ else { ?>
 </style>
 
 <?php
-
-if (isset($_SESSION['picture_password']) && ($_SESSION['picture_password']=="password"))
+$CheckPW = TRUE;  // set to FALSE to disable
+if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))
 {
     // lets hog the memory
     ini_set('memory_limit', '-1');
@@ -697,7 +700,7 @@ if (isset($_SESSION['picture_password']) && ($_SESSION['picture_password']=="pas
     
     // globals
     $createThumbs = TRUE;
-    $recursive = FALSE;
+    $recursive = TRUE;
 
     // get current directory
     $current_dir = getcwd();
