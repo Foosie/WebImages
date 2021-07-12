@@ -27,6 +27,7 @@
  
 // set $CheckPW to FALSE to disable password checking
 // set $recursive to FALSE to disable traversing sub folders
+// set $createThumbs to FALSE to disable thumbnail creation
 
 // start session before we do anything else
 session_start();
