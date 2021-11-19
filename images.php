@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images39.php
+ * images40.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -478,6 +478,11 @@ $server_root = $_SERVER['DOCUMENT_ROOT']; ?>
 <head>
     <link rel="icon" href="<?php echo $http_base.'/favicon.ico';?>" type="mage/x-icon"/>
     <link rel="shortcut icon" href="<?php echo $http_base.'/favicon.ico';?>" type="image/x-icon"/>
+    <meta charset="UTF-8">
+    <meta name="author" content="Don Mankin">
+    <meta name="description" content="Display all video & images in a folder">
+    <meta name="keywords" content="PHP, HTML, CSS, JavaScript">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 
 <body>
