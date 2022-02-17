@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images40.php
+ * images41.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -25,16 +25,14 @@
  * Visit https://opensource.org/licenses/MIT
 */
  
-// set $CheckPW to FALSE to disable password checking
-// set $recursive to FALSE to disable traversing sub folders
-// set $createThumbs to FALSE to disable thumbnail creation
-
 // start session before we do anything else
 session_start();
 
 ///////////  functions ///////////////
 
 function isMobile() {
+    // stubbing this function - display port works better
+    return FALSE;
     switch (getDeviceType()) {
         case "iphone":
         case "android":
@@ -113,7 +111,7 @@ function getFileList($dir, $recurse = FALSE)
     return $retval;
 }
 
-function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page) {
+function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
     
     // convert the array to a string
     $images_string = serialize($images);
@@ -144,13 +142,15 @@ function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_forma
                 <form>
                 <a href="<?php echo $prev_page;?>">&nbsp;<b>[Go Back]</b></a>
                 </form>
-            </td>            
-            <td>
-                <form method="post" id="logoff_form" action="">
-                <input type="hidden" name="prev_page" value="<?php echo $prev_page;?>"> 
-                <input type="submit" name="page_logout" value="[Logoff]">
-                </form>
-            </td>  
+            </td> <?php
+            if ($CheckPW == TRUE) { ?>  
+                <td>
+                    <form method="post" id="logoff_form" action="">
+                    <input type="hidden" name="prev_page" value="<?php echo $prev_page;?>"> 
+                    <input type="submit" name="page_logout" value="[Logoff]">
+                    </form>
+                </td> <?php
+            } ?>
         </tr>
     </table>  
     </center> <?php   
@@ -232,7 +232,7 @@ function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_forma
     echo "<br><br>";
 }
 
-function displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page) {
+function displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
     //  check bounds
     if (($image_current < 0) || $image_current > count($images))
         return;
@@ -269,13 +269,15 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
                 <form>
                 <a href="<?php echo $prev_page;?>">&nbsp;<b>[Go Back]</b></a>
                 </form>
-            </td>
-            <td>
-                <form method="post" id="logoff_form" action="">
-                <input type="hidden" name="prev_page" value="<?php echo $prev_page;?>"> 
-                <input type="submit" name="page_logout" value="[Logoff]">
-                </form>
-            </td>            
+            </td> <?php
+            if ($CheckPW == TRUE) { ?>  
+                <td>
+                    <form method="post" id="logoff_form" action="">
+                    <input type="hidden" name="prev_page" value="<?php echo $prev_page;?>"> 
+                    <input type="submit" name="page_logout" value="[Logoff]">
+                    </form>
+                </td> <?php
+            } ?>
         </tr>
     </table>
 
@@ -442,7 +444,7 @@ else {
 if (isset($_POST['submit_pass']) && $_POST['pass'])
 {
     $pass=$_POST['pass'];
-    if ($pass=="password")
+    if (($pass=="password1")||($pass=="password2"))
         $_SESSION['picture_password']=$pass;
     else
         $error="Incorrect Password";
@@ -692,8 +694,8 @@ else { ?>
 </style>
 
 <?php
-$CheckPW = TRUE;  // set to FALSE to disable
-if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))
+$CheckPW = FALSE;  // set to FALSE to disable
+if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password1")||($_SESSION['picture_password']=="password2"))))
 {
     // lets hog the memory
     ini_set('memory_limit', '-1');
@@ -707,6 +709,7 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
     // globals
     $createThumbs = TRUE;
     $recursive = TRUE;
+    $showHeader = FALSE;
 
     // get current directory
     $current_dir = getcwd();
@@ -726,10 +729,15 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
     }
     else { ?>
         <div style="font-size: 12px; font-weight: bold;"> <?php
+    }
+
+    if ($showHeader == TRUE) { ?>
+        &nbsp;<br>Directory "<b><?php echo basename($current_dir);?></b>" <?php
+        if ($recursive == TRUE) echo " recursed";
+    }
+    else { ?>
+        &nbsp; <?php
     } ?>
-      
-    &nbsp;<br>Root directory is "<b><?php echo basename($current_dir);?></b>"
-    <?php if ($recursive == TRUE) echo " and was"; else echo " and was not"; ?> recursed.
     
     </div>
     
@@ -762,11 +770,11 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
             createThumbnailsFromFileList($images,$server_root,$http_base,$pic_formats);
         
         // display images
-        displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page);
+        displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
     }
     else {     
         // display images
-        displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page);
+        displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
     } ?>
 
    
