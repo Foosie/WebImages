@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images41.php
+ * images.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -292,7 +292,7 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
         $url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/" . basename($img['file']);
         $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
         if (in_array(strtolower($extension), $pic_formats))
-            echo "<img class='fsimg' src='".$url."'>";
+            echo "<a href='".$url."' target='_blank'><img class='fsimg' src='".$url."'></a>";
         else if (in_array(strtolower($extension), $vid_formats)){       
             $fn = pathinfo($url, PATHINFO_FILENAME); 
             switch (getDeviceType()) {
@@ -694,7 +694,13 @@ else { ?>
 </style>
 
 <?php
-$CheckPW = FALSE;  // set to FALSE to disable
+
+// globals
+$createThumbs = TRUE;
+$recursive = TRUE;
+$showHeader = FALSE;
+$CheckPW = FALSE;
+
 if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password1")||($_SESSION['picture_password']=="password2"))))
 {
     // lets hog the memory
@@ -706,12 +712,7 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
     // resets the time limit value
     set_time_limit(0);
     
-    // globals
-    $createThumbs = TRUE;
-    $recursive = TRUE;
-    $showHeader = FALSE;
-
-    // get current directory
+   // get current directory
     $current_dir = getcwd();
     $url_root = $http_base . str_replace($server_root,"",str_replace("\\","/",$current_dir));
 
