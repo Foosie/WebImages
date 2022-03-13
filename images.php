@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images43.php
+ * images44.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -111,7 +111,7 @@ function getFileList($dir, $recurse = FALSE)
     return $retval;
 }
 
-function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
+function displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
     
     // convert the array to a string
     $images_string = serialize($images);
@@ -169,7 +169,7 @@ function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_forma
         if (!empty($img['file'])) {           
             $path_parts = pathinfo($img['file']);
             $extension = strtolower($path_parts['extension']);
-            $url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/" . basename($img['file']);
+            $url = $http_base . str_replace($server_root, "",$current_dir) . "/" . basename($fld['folder']) . "/";
             $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
             $thm_pathspec = $path_parts['dirname'] . "/thm/THM_" .basename($img['file']);
             $thm_url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/thm/THM_" . basename($img['file']);
@@ -303,7 +303,7 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
     if (!empty($img['file'])) {           
         $path_parts = pathinfo($img['file']);
         $extension = strtolower($path_parts['extension']);
-        $url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/" . basename($img['file']);
+        $url = $http_base . str_replace($server_root, "",$path_parts['dirname']) . "/" . basename($img['file']);        
         $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
         if (in_array(strtolower($extension), $pic_formats))
             echo "<a href='".$url."' target='_blank'><img class='fsimg' src='".$url."'></a>";
@@ -458,7 +458,7 @@ else {
 if (isset($_POST['submit_pass']) && $_POST['pass'])
 {
     $pass=$_POST['pass'];
-    if ($pass=="password")
+    if ($pass=="password") // change password to whatever
         $_SESSION['picture_password']=$pass;
     else
         $error="Incorrect Password";
@@ -715,7 +715,7 @@ $recursive = TRUE;
 $showHeader = TRUE;
 $CheckPW = FALSE;  // set to FALSE to disable
 
-if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))
+if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))  // change password to whatever
 {
     // lets hog the memory
     ini_set('memory_limit', '-1');
@@ -785,7 +785,7 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
             createThumbnailsFromFileList($images,$server_root,$http_base,$pic_formats);
         
         // display images
-        displayFileList($images,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
+        displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
     }
     else {     
         // display images
