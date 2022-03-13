@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images41.php
+ * images43.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -143,6 +143,13 @@ function displayFileList($images,$server_root,$http_base,$pic_formats,$vid_forma
                 <a href="<?php echo $prev_page;?>">&nbsp;<b>[Go Back]</b></a>
                 </form>
             </td> <?php
+            if (isset($_SESSION['foose_menu_root'])) { ?>
+                <td>
+                    <form>
+                    <a href="<?php echo $_SESSION['foose_menu_root']; ?>">&nbsp;<b>[Menu]</b></a>
+                    </form>
+                </td> <?php
+            }
             if ($CheckPW == TRUE) { ?>  
                 <td>
                     <form method="post" id="logoff_form" action="">
@@ -270,6 +277,13 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
                 <a href="<?php echo $prev_page;?>">&nbsp;<b>[Go Back]</b></a>
                 </form>
             </td> <?php
+            if (isset($_SESSION['foose_menu_root'])) { ?>
+                <td>
+                    <form>
+                    <a href="<?php echo $_SESSION['foose_menu_root']; ?>">&nbsp;<b>[Menu]</b></a>
+                    </form>
+                </td> <?php
+            }        
             if ($CheckPW == TRUE) { ?>  
                 <td>
                     <form method="post" id="logoff_form" action="">
@@ -292,7 +306,7 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
         $url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/" . basename($img['file']);
         $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
         if (in_array(strtolower($extension), $pic_formats))
-            echo "<img class='fsimg' src='".$url."'>";
+            echo "<a href='".$url."' target='_blank'><img class='fsimg' src='".$url."'></a>";
         else if (in_array(strtolower($extension), $vid_formats)){       
             $fn = pathinfo($url, PATHINFO_FILENAME); 
             switch (getDeviceType()) {
@@ -444,7 +458,7 @@ else {
 if (isset($_POST['submit_pass']) && $_POST['pass'])
 {
     $pass=$_POST['pass'];
-    if (($pass=="password1")||($pass=="password2"))
+    if ($pass=="password")
         $_SESSION['picture_password']=$pass;
     else
         $error="Incorrect Password";
@@ -694,8 +708,14 @@ else { ?>
 </style>
 
 <?php
+
+// globals
+$createThumbs = TRUE;
+$recursive = TRUE;
+$showHeader = TRUE;
 $CheckPW = FALSE;  // set to FALSE to disable
-if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password1")||($_SESSION['picture_password']=="password2"))))
+
+if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))
 {
     // lets hog the memory
     ini_set('memory_limit', '-1');
@@ -706,12 +726,7 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
     // resets the time limit value
     set_time_limit(0);
     
-    // globals
-    $createThumbs = TRUE;
-    $recursive = TRUE;
-    $showHeader = FALSE;
-
-    // get current directory
+   // get current directory
     $current_dir = getcwd();
     $url_root = $http_base . str_replace($server_root,"",str_replace("\\","/",$current_dir));
 
