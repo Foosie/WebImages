@@ -1,11 +1,7 @@
 <?php
 
 /*
-<<<<<<< HEAD
  * images43.php
-=======
- * images.php
->>>>>>> be8251339a63aa74442ab3fce4c67c397242a9b2
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -716,17 +712,10 @@ else { ?>
 // globals
 $createThumbs = TRUE;
 $recursive = TRUE;
-<<<<<<< HEAD
 $showHeader = TRUE;
 $CheckPW = FALSE;  // set to FALSE to disable
 
 if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password"))))
-=======
-$showHeader = FALSE;
-$CheckPW = FALSE;
-
-if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['picture_password']=="password1")||($_SESSION['picture_password']=="password2"))))
->>>>>>> be8251339a63aa74442ab3fce4c67c397242a9b2
 {
     // lets hog the memory
     ini_set('memory_limit', '-1');
