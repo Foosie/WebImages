@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images45.php
+ * images46.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -169,7 +169,8 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
         if (!empty($img['file'])) {           
             $path_parts = pathinfo($img['file']);
             $extension = strtolower($path_parts['extension']);
-            $url = $http_base . str_replace($server_root, "",$current_dir) . "/";
+            $url = $http_base . str_replace($server_root, "",$path_parts['dirname']) . "/" . basename($img['file']);
+            //$url = $http_base . str_replace($server_root, "",$current_dir) . "/";
             $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
             $thm_pathspec = $path_parts['dirname'] . "/thm/THM_" .basename($img['file']);
             $thm_url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/thm/THM_" . basename($img['file']);
@@ -201,7 +202,7 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
             }
             else if (in_array(strtolower($extension), $vid_formats)){
                 echo "<li class=\"video\">";
-                $fn = pathinfo($url, PATHINFO_FILENAME);
+                $fn = pathinfo($url, PATHINFO_FILENAME); 
                 switch (getDeviceType()) {
                     case "iphone":
                     case "ipad":
