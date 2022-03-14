@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images46.php
+ * images47.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -59,6 +59,30 @@ function getDeviceType() {
     return $device;
 }
 
+// some funny business here to attempt to support directory alias'
+function normalizeURL($img,$current_dir,$current_page) { 
+    if (!empty($img['folder'])) {
+        $dir = $current_dir;
+        $endofurl = basename($url);
+        $endofdir = basename($dir);       
+        $folder = "";          
+        while ($endofurl == $endofdir) {
+            $folder = $endofurl . "/" . $folder;
+            $url = str_replace($endofurl,"",$url);
+            $dir = str_replace($endofurl,"",$dir);
+            $endofurl = basename($url);
+            $endofdir = basename($dir);
+            if (substr($url, -1) == "/") 
+                $url = substr($url, 0, -1);
+            if (substr($dir, -1) == "/")
+                $dir = substr($dir, 0, -1); 
+        }                                
+        $url .= $folder . basename($img['folder']) . "/";
+        return array($url,$dir);        
+    }
+    return array($current_page,$current_dir);
+}
+
 function getFileList($dir, $recurse = FALSE)
 {
     // clear php file cache
@@ -111,7 +135,7 @@ function getFileList($dir, $recurse = FALSE)
     return $retval;
 }
 
-function displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
+function displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$current_page,$prev_page,$CheckPW) {
     
     // convert the array to a string
     $images_string = serialize($images);
@@ -169,11 +193,15 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
         if (!empty($img['file'])) {           
             $path_parts = pathinfo($img['file']);
             $extension = strtolower($path_parts['extension']);
-            $url = $http_base . str_replace($server_root, "",$path_parts['dirname']) . "/" . basename($img['file']);
-            //$url = $http_base . str_replace($server_root, "",$current_dir) . "/";
+            $normal_arr = normalizeURL($img,$path_parts['dirname'],$current_page);
+            if (basename($normal_arr[0]) != basename($normal_arr[1]))
+                $normal_url = $normal_arr[0] . basename($normal_arr[1]);
+            else
+                $normal_url = $normal_arr[0];
+            $url = $normal_url . "/" . basename($img['file']);            
             $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
             $thm_pathspec = $path_parts['dirname'] . "/thm/THM_" .basename($img['file']);
-            $thm_url = $http_base . str_replace($server_root,"",str_replace("\\","/",$path_parts['dirname'])) . "/thm/THM_" . basename($img['file']);
+            $thm_url = $normal_url . "/thm/THM_" . basename($img['file']);           
             if (in_array(strtolower($extension), $pic_formats)){
                 echo "<li class=\"projbox\">";
                 if (file_exists($thm_pathspec)) {
@@ -240,7 +268,7 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
     echo "<br><br>";
 }
 
-function displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW) {
+function displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$current_page,$prev_page, $CheckPW) {
     //  check bounds
     if (($image_current < 0) || $image_current > count($images))
         return;
@@ -303,8 +331,13 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
     
     if (!empty($img['file'])) {           
         $path_parts = pathinfo($img['file']);
-        $extension = strtolower($path_parts['extension']);
-        $url = $http_base . str_replace($server_root, "",$path_parts['dirname']) . "/" . basename($img['file']);        
+        $extension = strtolower($path_parts['extension']);  
+        $normal_arr = normalizeURL($img,$path_parts['dirname'],$current_page);
+        if (basename($normal_arr[0]) != basename($normal_arr[1]))
+            $normal_url = $normal_arr[0] . basename($normal_arr[1]);
+        else
+            $normal_url = $normal_arr[0];
+        $url = $normal_url . "/" . basename($img['file']);                    
         $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
         if (in_array(strtolower($extension), $pic_formats))
             echo "<a href='".$url."' target='_blank'><img class='fsimg' src='".$url."'></a>";
@@ -488,6 +521,8 @@ if ( isset( $_SERVER["HTTPS"] ) && strtolower( $_SERVER["HTTPS"] ) == "on" )
 else
     $protocol = "http://";
 $http_base = $protocol . $_SERVER['HTTP_HOST'];
+$current_page = $http_base . $_SERVER['REQUEST_URI'];
+$current_page = str_replace("%20"," ",$current_page);
 $server_root = $_SERVER['DOCUMENT_ROOT']; ?>
 
 <html>
@@ -786,11 +821,11 @@ if (($CheckPW == FALSE)||(isset($_SESSION['picture_password'])&&(($_SESSION['pic
             createThumbnailsFromFileList($images,$server_root,$http_base,$pic_formats);
         
         // display images
-        displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
+        displayFileList($images,$current_dir,$server_root,$http_base,$pic_formats,$vid_formats,$current_page,$prev_page,$CheckPW);
     }
     else {     
         // display images
-        displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$prev_page, $CheckPW);
+        displayFile($images,$image_current,$server_root,$http_base,$pic_formats,$vid_formats,$current_page,$prev_page,$CheckPW);
     } ?>
 
    
