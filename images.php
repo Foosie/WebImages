@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images47.php
+ * images48.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -63,6 +63,7 @@ function getDeviceType() {
 function normalizeURL($img,$current_dir,$current_page) { 
     if (!empty($img['folder'])) {
         $dir = $current_dir;
+        $url = $current_page;
         $endofurl = basename($url);
         $endofdir = basename($dir);       
         $folder = "";          
@@ -78,9 +79,33 @@ function normalizeURL($img,$current_dir,$current_page) {
                 $dir = substr($dir, 0, -1); 
         }                                
         $url .= $folder . basename($img['folder']) . "/";
-        return array($url,$dir);        
+        return array($url,$dir); 
     }
     return array($current_page,$current_dir);
+}
+
+// some funny business here to attempt to support directory alias'
+function getNestedFolders($img,$current_dir,$current_page) { 
+    if (!empty($img['file'])) {
+        $dir = $current_dir;
+        $url = $current_page;
+        $endofurl = basename($url);
+        $endofdir = basename($dir);       
+        $folder = "";          
+        while ($endofurl != $endofdir) {
+            $folder = $endofdir . "/" . $folder;
+            $dir = str_replace($endofdir,"",$dir);
+            $endofdir = basename($dir);
+            if (substr($url, -1) == "/") 
+                $url = substr($url, 0, -1);
+            if (substr($dir, -1) == "/")
+                $dir = substr($dir, 0, -1); 
+        }                                
+        $url = $url . "/" . $folder;
+        return $url;        
+    }
+    else
+        return $current_page;
 }
 
 function getFileList($dir, $recurse = FALSE)
@@ -190,18 +215,14 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
     echo "<ul>";
     $idx = 0;
     foreach($images as $img) {
-        if (!empty($img['file'])) {           
+        if (!empty($img['file'])) { 
             $path_parts = pathinfo($img['file']);
             $extension = strtolower($path_parts['extension']);
-            $normal_arr = normalizeURL($img,$path_parts['dirname'],$current_page);
-            if (basename($normal_arr[0]) != basename($normal_arr[1]))
-                $normal_url = $normal_arr[0] . basename($normal_arr[1]);
-            else
-                $normal_url = $normal_arr[0];
-            $url = $normal_url . "/" . basename($img['file']);            
+            $nested = getNestedFolders($img,$path_parts['dirname']."/",$current_page);
+            $url = $nested . "/" . basename($img['file']); 
             $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
             $thm_pathspec = $path_parts['dirname'] . "/thm/THM_" .basename($img['file']);
-            $thm_url = $normal_url . "/thm/THM_" . basename($img['file']);           
+            $thm_url = $nested . "/thm/THM_" . basename($img['file']);          
             if (in_array(strtolower($extension), $pic_formats)){
                 echo "<li class=\"projbox\">";
                 if (file_exists($thm_pathspec)) {
@@ -331,13 +352,9 @@ function displayFile($images,$image_current,$server_root,$http_base,$pic_formats
     
     if (!empty($img['file'])) {           
         $path_parts = pathinfo($img['file']);
-        $extension = strtolower($path_parts['extension']);  
-        $normal_arr = normalizeURL($img,$path_parts['dirname'],$current_page);
-        if (basename($normal_arr[0]) != basename($normal_arr[1]))
-            $normal_url = $normal_arr[0] . basename($normal_arr[1]);
-        else
-            $normal_url = $normal_arr[0];
-        $url = $normal_url . "/" . basename($img['file']);                    
+        $extension = strtolower($path_parts['extension']);
+        $nested = getNestedFolders($img,$path_parts['dirname']."/",$current_page);
+        $url = $nested . "/" . basename($img['file']);       
         $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
         if (in_array(strtolower($extension), $pic_formats))
             echo "<a href='".$url."' target='_blank'><img class='fsimg' src='".$url."'></a>";
@@ -573,7 +590,7 @@ body
     width:100%;
     font-family: "Myriad Pro","Helvetica Neue",Helvetica,Arial,Sans-Serif;
     color:#ffffff;
-    background-color:#8A4B08;
+    background-color:#645248;
 }
 .my_text
 {
@@ -608,7 +625,7 @@ if (isMobile()) { ?>
     {
         margin:0px;
         font-size:50px;
-        color:#8A4B08;
+        color:#645248;
     }
     #login_form input[type="password"]
     {
@@ -624,7 +641,7 @@ if (isMobile()) { ?>
         margin-top:10px;
         height:40px;
         font-size:32px;
-        background-color:#8A4B08;
+        background-color:#645248;
         border:none;
         box-shadow:0px 4px 0px 0px #61380B;
         color:white;
@@ -634,7 +651,7 @@ if (isMobile()) { ?>
     {
         margin:0px;
         margin-top:15px;
-        color:#8A4B08;
+        color:#645248;
         font-size:32px;
         font-weight:bold;
     } <?php  
@@ -654,7 +671,7 @@ else { ?>
     {
         margin:0px;
         font-size:25px;
-        color:#8A4B08;
+        color:#645248;
     }
     #login_form input[type="password"]
     {
@@ -670,7 +687,7 @@ else { ?>
         margin-top:10px;
         height:40px;
         font-size:16px;
-        background-color:#8A4B08;
+        background-color:#645248;
         border:none;
         box-shadow:0px 4px 0px 0px #61380B;
         color:white;
@@ -680,7 +697,7 @@ else { ?>
     {
         margin:0px;
         margin-top:15px;
-        color:#8A4B08;
+        color:#645248;
         font-size:17px;
         font-weight:bold;
     } <?php   
@@ -703,13 +720,13 @@ if (isMobile()) { ?>
     }
     a:link, a:visited {
     font-size: 22px;
-    background-color: #8A4B08;
+    background-color: #645248;
     color: white;
     text-decoration: none;
     }
     a:hover, a:active {
     font-size: 22px;
-    background-color: #8A4B08;
+    background-color: #645248;
     text-decoration: none;
     } <?php
 }
@@ -731,13 +748,13 @@ else { ?>
     }
     a:link, a:visited {
     font-size: 12px;
-    background-color: #8A4B08;
+    background-color: #645248;
     color: white;
     text-decoration: none;
     }
     a:hover, a:active {
     font-size: 12px;
-    background-color: #8A4B08;
+    background-color: #645248;
     text-decoration: none;
     } <?php
 } ?>
