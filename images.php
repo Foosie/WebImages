@@ -1,7 +1,7 @@
 <?php
 
 /*
- * images49.php
+ * images48.php
  *
  * Copyright (c) 2021 Don Mankin (Foose, Fooser, Foosie)
  *
@@ -114,7 +114,7 @@ function getFileList($dir, $recurse = FALSE)
     clearstatcache();
     
     // set up our supported image types
-    $imagetypes = ['image/jpeg','image/x-ms-bmp','image/png','image/gif','video/mp4','audio/mp4','video/quicktime']; // tif's unsupported by browsers
+    $imagetypes = ['image/jpeg','image/x-ms-bmp','image/png','image/gif','video/mp4','video/quicktime']; // tif's unsupported by browsers
     
     $retval = [];
     // add trailing slash if missing
@@ -214,7 +214,6 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
     echo "<div id='images'>";
     echo "<ul>";
     $idx = 0;
-            
     foreach($images as $img) {
         if (!empty($img['file'])) { 
             $path_parts = pathinfo($img['file']);
@@ -223,8 +222,7 @@ function displayFileList($images,$current_dir,$server_root,$http_base,$pic_forma
             $url = $nested . "/" . basename($img['file']); 
             $pathspec = $path_parts['dirname'] . "/" .basename($img['file']);
             $thm_pathspec = $path_parts['dirname'] . "/thm/THM_" .basename($img['file']);
-            $thm_url = $nested . "/thm/THM_" . basename($img['file']);
-
+            $thm_url = $nested . "/thm/THM_" . basename($img['file']);          
             if (in_array(strtolower($extension), $pic_formats)){
                 echo "<li class=\"projbox\">";
                 if (file_exists($thm_pathspec)) {
